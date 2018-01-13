@@ -2,7 +2,7 @@
 ** Copyright (C) 2017 Ivan Assing da Silva
 ** Contact: ivanassing@gmail.com
 **
-** This file is part of the FEA_MNE715 project.
+** This file is part of the FEA_MNE772 project.
 **
 ** This file is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 #include <QObject>
 
 #include "dxfreader.h"
+#include "msglog.h"
 
 #define FT3D_ext "ft3d"
 #define FTXL_ext "ftxl"
@@ -65,6 +66,7 @@ bool Truss3DFileManager::openFile(void)
     QFileInfo file(currentfilename);
     QString type = file.completeSuffix();
 
+MsgLog::information(QString("Reading file ")+currentfilename);
 
     if(type == DXF_ext)
     {
@@ -96,6 +98,7 @@ bool Truss3DFileManager::saveFile(void)
     if (currentfilename.isEmpty())
         return false;
 
+    MsgLog::information(QString("Writing file ")+currentfilename);
 
     QFile file(currentfilename);
     if (!file.open(QFile::WriteOnly | QFile::Text)) {

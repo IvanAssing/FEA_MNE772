@@ -2,7 +2,7 @@
 ** Copyright (C) 2017 Ivan Assing da Silva
 ** Contact: ivanassing@gmail.com
 **
-** This file is part of the FEA_MNE715 project.
+** This file is part of the FEA_MNE772 project.
 **
 ** This file is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,22 +20,25 @@
 
 #include <QMainWindow>
 
-
 #include "truss3d.h"
 #include "solid3d.h"
 
 #include "truss3dfilemanager.h"
 #include "solid3dfilemanager.h"
 
+#include "vtkgraphicwindow.h"
 
-
-#include "graphicwindow.h"
 
 namespace Ui {
 class MainWindow;
 }
 
 
+enum Model{
+    truss3d,
+    solid3d,
+    notdefined
+};
 
 ///
 /// \brief The MainWindow class
@@ -46,7 +49,6 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = 0);
-
     Truss3DFileManager *t3d_fileManager;
     Solid3DFileManager *s3d_fileManager;
 
@@ -57,8 +59,9 @@ public:
 
     Model model;
 
+    vtkGraphicWindow *vtkRenderer;
 
-    GraphicWindow *wgl;
+    bool isIterativeSolver;
 
     ~MainWindow();
 
@@ -69,11 +72,16 @@ public slots:
     virtual void solver(void);
 
     virtual void nodesReport(void);
-     virtual void elementsReport(void);
-
+    virtual void elementsReport(void);
     virtual void setResult(void);
-
     virtual void paintEvent(QPaintEvent *event);
+    virtual void keyPressEvent(QKeyEvent *event);
+    virtual void updateParameters(void);
+
+    virtual void direct_solver(void);
+    virtual void iterative_solver(void);
+
+    virtual void updateCutter(void);
 
 
 private:

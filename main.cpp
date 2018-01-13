@@ -2,7 +2,7 @@
 ** Copyright (C) 2017 Ivan Assing da Silva
 ** Contact: ivanassing@gmail.com
 **
-** This file is part of the FEA_MNE715 project.
+** This file is part of the FEA_MNE772 project.
 **
 ** This file is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,8 +17,16 @@
 #include "mainwindow.h"
 #include <QApplication>
 
+#include <QSurfaceFormat>
+#include <QVTKOpenGLWidget.h>
+
+//#include "vtkmainwindow.h"
+
+
 int main(int argc, char *argv[])
 {
+    QSurfaceFormat::setDefaultFormat(QVTKOpenGLWidget::defaultFormat());
+
     QApplication a(argc, argv);
 
     MainWindow w;

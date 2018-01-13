@@ -2,7 +2,7 @@
 ** Copyright (C) 2017 Ivan Assing da Silva
 ** Contact: ivanassing@gmail.com
 **
-** This file is part of the FEA_MNE715 project.
+** This file is part of the FEA_MNE772 project.
 **
 ** This file is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,38 +26,48 @@
 #include "truss3dreader.h"
 #include "solid3dreader.h"
 
+#include "msglog.h"
+
+//#include "vtk.h"
+//#include "vtkmainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     // interface configurations
+
+    setMouseTracking(true);
+    setFocusPolicy(Qt::StrongFocus);
+
     ui->setupUi(this);
-    wgl = ui->openGLWidget;
+    vtkRenderer = ui->openGLWidget;
 
 
-    connect(ui->actionTopView, SIGNAL(triggered(bool)), wgl->view, SLOT(setXYTopView(void)));
-    connect(ui->actionBottomView, SIGNAL(triggered(bool)), wgl->view, SLOT(setXYBottomView(void)));
-    connect(ui->actionRightView, SIGNAL(triggered(bool)), wgl->view, SLOT(setYZTopView(void)));
-    connect(ui->actionLeftView, SIGNAL(triggered(bool)), wgl->view, SLOT(setYZBottomView(void)));
-    connect(ui->actionFrontView, SIGNAL(triggered(bool)), wgl->view, SLOT(setXZTopView(void)));
-    connect(ui->actionBackView, SIGNAL(triggered(bool)), wgl->view, SLOT(setXZBottomView(void)));
-    connect(ui->actionIsoView, SIGNAL(triggered(bool)), wgl->view, SLOT(setIsometricView(void)));
 
-    connect(ui->actionOrthographicProjection, SIGNAL(triggered(bool)), wgl->view, SLOT(setOrthografic(void)));
-    connect(ui->actionPerpectiveProjection, SIGNAL(triggered(bool)), wgl->view, SLOT(setPerpective(void)));
+    connect(ui->actionTopView, SIGNAL(triggered(bool)), vtkRenderer, SLOT(setXYTopView(void)));
+    connect(ui->actionBottomView, SIGNAL(triggered(bool)), vtkRenderer, SLOT(setXYBottomView(void)));
+    connect(ui->actionRightView, SIGNAL(triggered(bool)), vtkRenderer, SLOT(setYZTopView(void)));
+    connect(ui->actionLeftView, SIGNAL(triggered(bool)), vtkRenderer, SLOT(setYZBottomView(void)));
+    connect(ui->actionFrontView, SIGNAL(triggered(bool)), vtkRenderer, SLOT(setXZTopView(void)));
+    connect(ui->actionBackView, SIGNAL(triggered(bool)), vtkRenderer, SLOT(setXZBottomView(void)));
+    connect(ui->actionIsoView, SIGNAL(triggered(bool)), vtkRenderer, SLOT(setIsometricView(void)));
 
-    connect(ui->actiontakeSnapshoot, SIGNAL(triggered(bool)), wgl, SLOT(takePicture(void)));
-    connect(ui->actionSelect, SIGNAL(triggered(bool)), wgl, SLOT(select(void)));
-    connect(ui->actionSolved_Mesh, SIGNAL(triggered(bool)), wgl, SLOT(showSolvedModel(void)));
-    connect(ui->actionInitialMesh, SIGNAL(triggered(bool)), wgl, SLOT(showInitialModel(void)));
-    connect(ui->actionGrid, SIGNAL(triggered(bool)), wgl, SLOT(showGrid(void)));
-    connect(ui->actionLegend, SIGNAL(triggered(bool)), wgl, SLOT(showLegend(void)));
+    connect(ui->actionOrthographicProjection, SIGNAL(triggered(bool)), vtkRenderer, SLOT(setParallelProjection(void)));
+    connect(ui->actionPerpectiveProjection, SIGNAL(triggered(bool)), vtkRenderer, SLOT(setPerspectiveProjection(void)));
 
-    connect(ui->actionTurnOffLighting, SIGNAL(triggered(bool)), wgl, SLOT(turnOffLighting(void)));
-    ui->actionTurnOffLighting->setChecked(true);
-    connect(ui->actionShowMesh, SIGNAL(triggered(bool)), wgl, SLOT(showMesh(void)));
-    ui->actionShowMesh->setChecked(true);
+    connect(ui->actionScreenshoot, SIGNAL(triggered(bool)), vtkRenderer, SLOT(screenshot(void)));
+
+    //    connect(ui->actionSelect, SIGNAL(triggered(bool)), wgl, SLOT(select(void)));
+    //    connect(ui->actionSolved_Mesh, SIGNAL(triggered(bool)), wgl, SLOT(showSolvedModel(void)));
+    //    connect(ui->actionInitialMesh, SIGNAL(triggered(bool)), wgl, SLOT(showInitialModel(void)));
+    //    connect(ui->actionGrid, SIGNAL(triggered(bool)), wgl, SLOT(showGrid(void)));
+    //    connect(ui->actionLegend, SIGNAL(triggered(bool)), wgl, SLOT(showLegend(void)));
+
+    //    connect(ui->actionTurnOffLighting, SIGNAL(triggered(bool)), wgl, SLOT(turnOffLighting(void)));
+    //    ui->actionTurnOffLighting->setChecked(true);
+    //    connect(ui->actionShowMesh, SIGNAL(triggered(bool)), wgl, SLOT(showMesh(void)));
+    //    ui->actionShowMesh->setChecked(true);
 
     connect(ui->action_Open, SIGNAL(triggered(bool)), this, SLOT(openFile()));
     connect(ui->action_Save, SIGNAL(triggered(bool)), this, SLOT(saveFile()));
@@ -65,9 +75,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->action_Solver, SIGNAL(triggered(bool)), this, SLOT(solver()));
     connect(ui->action_Exit, SIGNAL(triggered(bool)), this, SLOT(close()));
 
-    connect(ui->actionstartSimulation, SIGNAL(triggered(bool)), wgl, SLOT(startSimulation()));
-    connect(ui->actionstopSimulation, SIGNAL(triggered(bool)), wgl, SLOT(stopSimulation()));
-    connect(ui->actionpauseSimulation, SIGNAL(triggered(bool)), wgl, SLOT(pauseSimulation()));
+    connect(ui->actionstartSimulation, SIGNAL(triggered(bool)), vtkRenderer, SLOT(startSimulation()));
+    connect(ui->actionstopSimulation, SIGNAL(triggered(bool)), vtkRenderer, SLOT(stopSimulation()));
+    connect(ui->actionpauseSimulation, SIGNAL(triggered(bool)), vtkRenderer, SLOT(pauseSimulation()));
 
     connect(ui->actionstressxx, SIGNAL(triggered(bool)), this, SLOT(setResult()));
     connect(ui->actionstressyy, SIGNAL(triggered(bool)), this, SLOT(setResult()));
@@ -79,11 +89,42 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionresultux, SIGNAL(triggered(bool)), this, SLOT(setResult()));
     connect(ui->actionresultuy, SIGNAL(triggered(bool)), this, SLOT(setResult()));
     connect(ui->actionresultuz, SIGNAL(triggered(bool)), this, SLOT(setResult()));
+    connect(ui->actionresultabsu, SIGNAL(triggered(bool)), this, SLOT(setResult()));
+    connect(ui->actionpstress1, SIGNAL(triggered(bool)), this, SLOT(setResult()));
+    connect(ui->actionpstress2, SIGNAL(triggered(bool)), this, SLOT(setResult()));
+    connect(ui->actionpstress3, SIGNAL(triggered(bool)), this, SLOT(setResult()));
 
     connect(ui->actionNodesReport, SIGNAL(triggered(bool)), this, SLOT(nodesReport()));
     connect(ui->actionElementsReport, SIGNAL(triggered(bool)), this, SLOT(elementsReport()));
 
-    //connect(ui->actionTest, SIGNAL(triggered(bool)), wgl, SLOT(tests()));
+    connect(ui->actionEllipsoid, SIGNAL(triggered(bool)), vtkRenderer, SLOT(ellipsoidGlyphsVisualization()));
+    connect(ui->actionHyperstreamline, SIGNAL(triggered(bool)), vtkRenderer, SLOT(hyperstreamlinesVisualization()));
+    connect(ui->actionIsosurface, SIGNAL(triggered(bool)), vtkRenderer, SLOT(isoSurfaceVisualization()));
+    connect(ui->actionSuperquadricGlyph, SIGNAL(triggered(bool)), vtkRenderer, SLOT(superquadricsGlyphsVisualization()));
+    connect(ui->actionVectorDisplacement, SIGNAL(triggered(bool)), vtkRenderer, SLOT(displacementVisualization()));
+    connect(ui->actionCutterScalar, SIGNAL(triggered(bool)), vtkRenderer, SLOT(planeCutter()));
+    connect(ui->actionOriginalMesh, SIGNAL(triggered(bool)), vtkRenderer, SLOT(addDataSet()));
+    connect(ui->actionScalarColorMap, SIGNAL(triggered(bool)), vtkRenderer, SLOT(addDataSet_solved()));
+
+
+    connect(ui->action_Solver_2, SIGNAL(triggered(bool)), this, SLOT(iterative_solver()));
+    connect(ui->action_Solver_3, SIGNAL(triggered(bool)), this, SLOT(direct_solver()));
+
+
+    // setup output widget for MsgLog
+    MsgLog::output = ui->listWidget;
+    ui->listWidget->setAutoScroll(true);
+
+    ui->cutter_nx->setText(QString("-1.0"));
+    ui->cutter_ny->setText(QString("0.0"));
+    ui->cutter_nz->setText(QString("0.0"));
+    ui->sqg_gamma->setText(QString("3.0"));
+
+    connect(ui->cutter_nx, SIGNAL(editingFinished()), this, SLOT(updateCutter()));
+    connect(ui->cutter_ny, SIGNAL(editingFinished()), this, SLOT(updateCutter()));
+    connect(ui->cutter_nz, SIGNAL(editingFinished()), this, SLOT(updateCutter()));
+    connect(ui->cutter_position, SIGNAL(valueChanged(int)), this, SLOT(updateCutter()));
+
 
     t3d_fileManager = new Truss3DFileManager(ui->treeWidget);
     s3d_fileManager = new Solid3DFileManager(ui->treeWidget);
@@ -92,14 +133,17 @@ MainWindow::MainWindow(QWidget *parent) :
     t3d_mesh = new Truss3D;
     s3d_mesh = new Solid3D;
 
-    model = truss3d;
+    model = notdefined;
 
     ui->actionresultuz->setChecked(true);
     lastAction = ui->actionresultuz;
-    wgl->s3d_result = 9; // default uz
+    vtkRenderer->s3d_result = 9; // default uz
     ui->resultsToolBar->setDisabled(true);
 
-        QDir::setCurrent("../FEA_MNE715/models");
+    QDir::setCurrent("../FEA_MNE772/models");
+
+    isIterativeSolver = true;
+    updateParameters();
 
 }
 
@@ -109,11 +153,9 @@ void MainWindow::openFile(void)
     QString filename =
             QFileDialog::getOpenFileName(this, QObject::tr("Open FEA File"),
                                          QDir::currentPath(),
-                                         QObject::tr("FEA Files (*.fsxl *.ftxl *.ft3d);;Ansys CDB File (*.cdb);;Truss3D Files (*.ftxl *.ft3d);;DXF File (*.dxf)"));
+                                         QObject::tr("Solid 3D Files (*.fsxl);;Ansys CDB File (*.cdb);;Truss3D Files (*.ftxl *.ft3d);;DXF File (*.dxf)"));
     if (filename.isEmpty())
         return;
-
-//    QString filename = "../models/cube.fsxl";
 
     QFileInfo file(filename);
     QString type = file.completeSuffix();
@@ -123,22 +165,25 @@ void MainWindow::openFile(void)
         t3d_fileManager->currentfilename = filename;
         if(!t3d_fileManager->openFile())
             return;
-        wgl->restart();
+
         this->setWindowTitle(QString("Truss 3D Model [%1]").arg(t3d_fileManager->currentfilename));
 
         Truss3DReader reader(t3d_mesh);
         t3d_mesh = reader.read(t3d_fileManager);
 
-        wgl->model = model;
-        wgl->solvedModel->ready = false;
-        wgl->simulationModel->ready = false;
-
-        wgl->setupInitialModel(t3d_mesh);
-        wgl->isInitialModelActived = true;
-        ui->actionInitialMesh->setChecked(true);
-        wgl->updateGL();
+        MsgLog::information("Truss 3D Model loaded");
+        MsgLog::result(QString("%1 nodes, %2 elements").arg(t3d_mesh->nNodes, t3d_mesh->nElements));
 
         ui->resultsToolBar->setDisabled(true);
+
+
+        //        double volume, weight;
+        //        s3d_mesh->infoGeometry(volume, weight);
+        //        MsgLog::result(QString("Model's volume: %1").arg(volume));
+        //        MsgLog::result(QString("Model's weight: %1").arg(weight));
+
+        vtkRenderer->removeDataSet();
+        vtkRenderer->addDataSet(t3d_mesh);
 
     }
     else if (type == "fsxl" || type == "cdb")
@@ -147,33 +192,36 @@ void MainWindow::openFile(void)
         s3d_fileManager->currentfilename = filename;
         if(!s3d_fileManager->openFile())
             return;
-        wgl->restart();
+
         this->setWindowTitle(QString("Solid 3D Model [%1]").arg(s3d_fileManager->currentfilename));
 
         Solid3DReader reader(s3d_mesh);
         s3d_mesh = reader.read(s3d_fileManager);
 
-        for(int i=0; i<s3d_mesh->nElements; i++)
-            s3d_mesh->elements[i]->evaluateNormals();
+        MsgLog::information("Solid 3D Model loaded");
+        MsgLog::result(QString("%1 nodes, %2 elements").arg(s3d_mesh->nNodes).arg(s3d_mesh->nElements));
 
 
-        wgl->model = model;
-        wgl->solvedModel->ready = false;
-        wgl->simulationModel->ready = false;
+        ui->resultsToolBar->setDisabled(false);
 
-        wgl->setupInitialModel(s3d_mesh);
-        wgl->isInitialModelActived = true;
-        ui->actionInitialMesh->setChecked(true);
+        s3d_mesh->evalStiffnessMatrix();
+        s3d_mesh->evalLoadVector();
+        double volume, weight;
+        s3d_mesh->infoGeometry(volume, weight);
+        MsgLog::result(QString("Model's volume: %1").arg(volume));
+        MsgLog::result(QString("Model's weight: %1").arg(weight));
 
-        wgl->updateGL();
-
-        ui->resultsToolBar->setDisabled(true);
+        vtkRenderer->reset();
+        vtkRenderer->s3d_mesh = s3d_mesh;
+        vtkRenderer->removeDataSet();
+        vtkRenderer->addDataSet();
+        //vtkWin->show();
 
     }
     else
         return;
 
-    wgl->updateGL();
+    //wgl->update();
 
 }
 
@@ -184,7 +232,6 @@ void MainWindow::saveFile(void)
     else
         s3d_fileManager->saveFile();
 }
-
 
 void MainWindow::saveAs(void)
 {
@@ -237,25 +284,22 @@ void MainWindow::solver(void)
             str = QString("Solving the Truss3D model... (%1 nodes, %2 elements)...").
                     arg(t3d_mesh->nNodes).arg(t3d_mesh->nElements);
             ui->statusBar->showMessage(str, 60000);
+
+            MsgLog::information(QString("Starting the Truss3D Solver"));
+
             t3d_mesh->evalStiffnessMatrix();
-            t3d_mesh->solve_simulation(wgl->nFrames);
+            t3d_mesh->solve();
+            //t3d_mesh->solve_simulation(wgl->nFrames);
             t3d_mesh->isSolved = true;
 
             str += QString(" ready! %1 s").arg(timer.elapsed()/1000.);
             ui->statusBar->showMessage(str, 60000);
-
-            wgl->setupSimulationModel(t3d_mesh);
-            wgl->setupSolvedModel(t3d_mesh);
+            MsgLog::information(QString("Total solver time: %1 s").arg(timer.elapsed()/1000.));
 
 
-            wgl->isSolvedModelActived = true;
-            wgl->isSimulationModelActived = false;
-            ui->actionSolved_Mesh->setChecked(true);
+            vtkRenderer->removeDataSet();
+            vtkRenderer->addDataSet_solved(t3d_mesh);
 
-            wgl->isInitialModelActived = false;
-            ui->actionInitialMesh->setChecked(false);
-
-            wgl->updateGL();
         }
     }
     else
@@ -276,28 +320,30 @@ void MainWindow::solver(void)
             str = QString("Solving the Solid3D model... (%1 nodes, %2 elements)...").
                     arg(s3d_mesh->nNodes).arg(s3d_mesh->nElements);
             ui->statusBar->showMessage(str, 60000);
+
+            MsgLog::information(QString("Starting the Solid3D Solver"));
+
             s3d_mesh->evalStiffnessMatrix();
             s3d_mesh->evalLoadVector();
             //s3d_mesh->evalLoadVector();
-            //s3d_mesh->solve();
-            s3d_mesh->solve_simulation(wgl->nFrames);
-            //s3d_mesh->isSolved = true;
+
+            s3d_mesh->isIterativeSolver = isIterativeSolver;
+            s3d_mesh->solve();
+            //s3d_mesh->solve_simulation(wgl->nFrames);
+            s3d_mesh->isSolved = true;
 
             str += QString(" ready! %1 s").arg(timer.elapsed()/1000.);
             ui->statusBar->showMessage(str, 60000);
-            ui->resultsToolBar->setDisabled(false);
+            MsgLog::information(QString("Total solver time was %1 s").arg(timer.elapsed()/1000.));
 
-            wgl->setupSimulationModel(s3d_mesh);
-            wgl->setupSolvedModel(s3d_mesh);
 
-            wgl->isSolvedModelActived = true;
-            wgl->isSimulationModelActived = false;
-            ui->actionSolved_Mesh->setChecked(true);
 
-            wgl->isInitialModelActived = false;
-            ui->actionInitialMesh->setChecked(false);
+            vtkRenderer->reset();
+            vtkRenderer->s3d_mesh = s3d_mesh;
+            vtkRenderer->removeDataSet();
+            vtkRenderer->addDataSet_simulation();
 
-            wgl->updateGL();
+
         }
     }
 }
@@ -306,74 +352,192 @@ void MainWindow::setResult(void)
 {
     if(ui->actionstressxx->isChecked() && lastAction != ui->actionstressxx)
     {
-        wgl->s3d_result = 0;
+        vtkRenderer->s3d_result = 0;
         lastAction->setChecked(false);
         lastAction = ui->actionstressxx;
     }
     else if(ui->actionstressyy->isChecked() && lastAction != ui->actionstressyy)
     {
-        wgl->s3d_result = 1;
+        vtkRenderer->s3d_result = 1;
         lastAction->setChecked(false);
         lastAction = ui->actionstressyy;
     }
     else if(ui->actionstresszz->isChecked() && lastAction != ui->actionstresszz)
     {
-        wgl->s3d_result = 2;
+        vtkRenderer->s3d_result = 2;
         lastAction->setChecked(false);
         lastAction = ui->actionstresszz;
     }
     else if(ui->actionstressxy->isChecked() && lastAction != ui->actionstressxy)
     {
-        wgl->s3d_result = 3;
+        vtkRenderer->s3d_result = 3;
         lastAction->setChecked(false);
         lastAction = ui->actionstressxy;
     }
     else if(ui->actionstressyz->isChecked() && lastAction != ui->actionstressyz)
     {
-        wgl->s3d_result = 4;
+        vtkRenderer->s3d_result = 4;
         lastAction->setChecked(false);
         lastAction = ui->actionstressyz;
     }
     else if(ui->actionstresszx->isChecked() && lastAction != ui->actionstresszx)
     {
-        wgl->s3d_result = 5;
+        vtkRenderer->s3d_result = 5;
         lastAction->setChecked(false);
         lastAction = ui->actionstresszx;
     }
     else if(ui->actionstressvonmises->isChecked() && lastAction != ui->actionstressvonmises)
     {
-        wgl->s3d_result = 6;
+        vtkRenderer->s3d_result = 6;
         lastAction->setChecked(false);
         lastAction = ui->actionstressvonmises;
     }
     else if(ui->actionresultux->isChecked() && lastAction != ui->actionresultux)
     {
-        wgl->s3d_result = 7;
+        vtkRenderer->s3d_result = 7;
         lastAction->setChecked(false);
         lastAction = ui->actionresultux;
     }
     else if(ui->actionresultuy->isChecked() && lastAction != ui->actionresultuy)
     {
-        wgl->s3d_result = 8;
+        vtkRenderer->s3d_result = 8;
         lastAction->setChecked(false);
         lastAction = ui->actionresultuy;
     }
     else if(ui->actionresultuz->isChecked() && lastAction != ui->actionresultuz)
     {
-        wgl->s3d_result = 9;
+        vtkRenderer->s3d_result = 9;
         lastAction->setChecked(false);
         lastAction = ui->actionresultuz;
     }
+    else if(ui->actionresultabsu->isChecked() && lastAction != ui->actionresultabsu)
+    {
+        vtkRenderer->s3d_result = 10;
+        lastAction->setChecked(false);
+        lastAction = ui->actionresultabsu;
+    }
+    else if(ui->actionpstress1->isChecked() && lastAction != ui->actionpstress1)
+    {
+        vtkRenderer->s3d_result = 11;
+        lastAction->setChecked(false);
+        lastAction = ui->actionpstress1;
+    }
+    else if(ui->actionpstress2->isChecked() && lastAction != ui->actionpstress2)
+    {
+        vtkRenderer->s3d_result = 12;
+        lastAction->setChecked(false);
+        lastAction = ui->actionpstress2;
+    }
+    else if(ui->actionpstress3->isChecked() && lastAction != ui->actionpstress3)
+    {
+        vtkRenderer->s3d_result = 13;
+        lastAction->setChecked(false);
+        lastAction = ui->actionpstress3;
+    }
 
-    wgl->updateGL();
+    //vtkRenderer->removeDataSet();
+    //vtkRenderer->addDataSet_simulation(s3d_mesh);
 }
 
+void MainWindow::updateParameters(void)
+{
+
+    vtkRenderer->elg_scalefactor = ui->elg_scalefactor->value()/100.;
+    vtkRenderer->elg_colorbyeigenvalues = ui->elg_colorbyeigen->isChecked();
+
+    vtkRenderer->sqg_scalefactor = ui->sqg_scalefactor->value()/100.;
+    vtkRenderer->sqg_colorbyeigenvalues = ui->sqg_colorbyeigen->isChecked();
+    vtkRenderer->sqg_gamma = ui->sqg_gamma->text().toDouble();
+    vtkRenderer->sqg_absoluteeigenvalues = ui->sqg_abs_eigenvalues->isChecked();
+
+    vtkRenderer->amplification = 50.*(1+ui->def_factor->value()/100.);
+    vtkRenderer->showElements = ui->showElements->isChecked();
+    vtkRenderer->showNodes = ui->showNodes->isChecked();
+    vtkRenderer->showTranslucentModel = ui->showTranslucentModel->isChecked();
+
+    vtkRenderer->showUndeformedModel = ui->ShowUndeformedModel->isChecked();
+    vtkRenderer->showRestrictions = ui->showRestrictions->isChecked();
+    vtkRenderer->showLoading = ui->showLoading->isChecked();
+
+    vtkRenderer->hsl_radiusfactor = ui->hsl_radiusfactor->value()/100.;
+    vtkRenderer->hsl_spLoading = ui->hsl_spLoading->isChecked();
+    vtkRenderer->hsl_spPlanez0 = ui->hsl_spPlanez0->isChecked();
+    vtkRenderer->hsl_spRandom = ui->hsl_spRandom->isChecked();
+    vtkRenderer->hsl_spRestrictions = ui->hsl_spRestrictions->isChecked();
+
+    vtkRenderer->hsl_v1 = ui->hsl_v1->isChecked();
+    vtkRenderer->hsl_v2 = ui->hsl_v2->isChecked();
+    vtkRenderer->hsl_v3 = ui->hsl_v3->isChecked();
+
+    vtkRenderer->nIsoSurfaceSlices = ui->nIsoSurfaceSlices->value();
+
+    vtkRenderer->cutterNormalPlane = QVector3D(ui->cutter_nx->text().toDouble(),
+                                               ui->cutter_ny->text().toDouble(),
+                                               ui->cutter_nz->text().toDouble());
+
+    vtkRenderer->cutterPosition = ui->cutter_position->value()/100.;
+
+    vtkRenderer->showLeftPart = ui->showLeftPart->isChecked();
+
+}
 
 void MainWindow::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event);
-    wgl->updateGL();
+    updateParameters();
+    //vtkRenderer->renderVTK();
 }
+
+
+void MainWindow::direct_solver(void)
+{
+    isIterativeSolver = false;
+    solver();
+}
+
+void MainWindow::iterative_solver(void)
+{
+    isIterativeSolver = true;
+    solver();
+}
+
+void MainWindow::updateCutter(void)
+{
+    updateParameters();
+    vtkRenderer->planeCutter();
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    if(event->key() == Qt::Key_F5)
+    {
+        delete ui->openGLWidget;
+
+        ui->openGLWidget = new vtkGraphicWindow(ui->splitter_1);
+        ui->openGLWidget->setObjectName(QStringLiteral("openGLWidget"));
+        ui->openGLWidget->setMouseTracking(true);
+        ui->openGLWidget->setFocusPolicy(Qt::StrongFocus);
+        ui->openGLWidget->setAutoFillBackground(true);
+        ui->splitter_1->addWidget(ui->openGLWidget);
+
+        vtkRenderer = ui->openGLWidget;
+
+        updateParameters();
+        vtkRenderer->s3d_mesh = s3d_mesh;
+        vtkRenderer->removeDataSet();
+        vtkRenderer->addDataSet();
+
+
+        MsgLog::error(QString("vtkRenderer was restarted"));
+    }
+
+    if((event->key() == Qt::Key_F1) || (event->key() == Qt::Key_Space))
+        vtkRenderer->screenshot();
+
+    if(event->key() == Qt::Key_F8)
+        vtkRenderer->zoomToExtent();
+}
+
 
 void MainWindow::nodesReport(void)
 {
@@ -437,9 +601,6 @@ void MainWindow::elementsReport(void)
     }
 }
 
-
-
-
 MainWindow::~MainWindow()
 {
     delete t3d_fileManager;
@@ -448,3 +609,5 @@ MainWindow::~MainWindow()
     delete s3d_mesh;
     delete ui;
 }
+
+

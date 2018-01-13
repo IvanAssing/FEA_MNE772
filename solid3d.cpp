@@ -2,7 +2,7 @@
 ** Copyright (C) 2017 Ivan Assing da Silva
 ** Contact: ivanassing@gmail.com
 **
-** This file is part of the FEA_MNE715 project.
+** This file is part of the FEA_MNE772 project.
 **
 ** This file is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,11 +26,28 @@
 #include <QStringList>
 #include <QElapsedTimer>
 #include <QTextStream>
+#include <vtkMath.h>
 
 #include <mth/matrix.h>
 
 #define buffersize 10
 
+const char strResults[14][50] = {
+    "normal stress x",
+    "normal stress y",
+    "normal stress z",
+    "shear stress xy",
+    "shear stress yz",
+    "shear stress zx",
+    "von Mises stress",
+    "displacement ux",
+    "displacement uy",
+    "displacement uz",
+    "absolute displacement",
+    "principal stress 1",
+    "principal stress 2",
+    "principal stress 3",
+};
 
 Solid3D::Solid3D()
 {
@@ -39,6 +56,7 @@ Solid3D::Solid3D()
     isSolved = false;
     isMounted = false;
     isSolved_simulation = false;
+    isIterativeSolver = true;
 }
 
 
@@ -231,6 +249,7 @@ Solid3D::Solid3D(QString filename)
 
     } while (!line.isNull());
 
+    isIterativeSolver = true;
 }
 
 
@@ -273,6 +292,8 @@ void Solid3D::evalLoadVector(double factor)
         f(3*nodes[i]->index) = factor * nodes[i]->loading[0];
         f(3*nodes[i]->index+1) = factor * nodes[i]->loading[1];
         f(3*nodes[i]->index+2) = factor * nodes[i]->loading[2];
+
+        nodes[i]->loading = new double[3];
     }
 
     //#pragma omp parallel for num_threads(FEM_NUM_THREADS)
@@ -282,13 +303,17 @@ void Solid3D::evalLoadVector(double factor)
             int iface = elements[i]->pface;
 
             double force = factor * *(elements[i]->pressure)*elements[i]->areas[iface];
-            //force *= -100000;
 
             for(int j=0; j<3; j++)
             {
                 f(3*elements[i]->nodes[idf[iface][j]]->index+0) += -force*elements[i]->normals[iface].x();
                 f(3*elements[i]->nodes[idf[iface][j]]->index+1) += -force*elements[i]->normals[iface].y();
                 f(3*elements[i]->nodes[idf[iface][j]]->index+2) += -force*elements[i]->normals[iface].z();
+
+                elements[i]->nodes[idf[iface][j]]->loading[0] = -force*elements[i]->normals[iface].x();
+                elements[i]->nodes[idf[iface][j]]->loading[1] = -force*elements[i]->normals[iface].y();
+                elements[i]->nodes[idf[iface][j]]->loading[2] = -force*elements[i]->normals[iface].z();
+
             }
         }
 }
@@ -296,7 +321,7 @@ void Solid3D::evalLoadVector(double factor)
 
 void Solid3D::solve(void)
 {
-    std::ofstream flog("/home/ivan/Projects/data3/log_solver.txt");
+    //std::ofstream flog("/home/ivan/Projects/data3/log_solver.txt");
 
     Mth::Matrix kc(k); // cópias
     Mth::Vector fc(f);
@@ -310,8 +335,7 @@ void Solid3D::solve(void)
                 int n = 3*nodes[i]->index+j;
                 for(int t=0; t<3*nNodes; t++)
                 {
-                    kc(n, t) = 0.0;
-                    //kc(t, n) = 0.0;
+                    kc(n, t) = kc(t, n) =  0.0;
                 }
                 kc(n, n) = 1.0;
                 fc(n) = nodes[i]->displacements[j];
@@ -325,8 +349,8 @@ void Solid3D::solve(void)
     //    flog<<print;
     //    //kc *= 1e+8;
 
-    flog<<"\n\n Vetor de carga\n";
-    flog<<f;
+    //flog<<"\n\n Vetor de carga\n";
+    //flog<<f;
 
     //    Mth::Matrix kcc(kc);
     //    Mth::Vector fcc(fc);
@@ -338,16 +362,38 @@ void Solid3D::solve(void)
     // Aloca vetor para resultados
     u.resize(3*nNodes);
 
-    kc.solve(fc, u);
+//    QElapsedTimer timer;
+//    timer.start();
+//    std::cerr<<"starting linear system solver...\n";
 
+    if(isIterativeSolver)
+    {
+        MsgLog::information(QString("Iterative solver, spare matrix on GPU"));
+        QString log;
+        kc.solve_sparse(fc, u, log); // solve sparse on GPU
+        //kc.solve_sparse_cpu(fc, u, log); // solve sparse on GPU
+        QStringList list;
+        list = log.split("\n");
+        for(int i=0; i<list.size();i++)
+        MsgLog::information(list[i]);
+    }
+    else
+    {
+        MsgLog::information(QString("Direct solver, dense matrix on CPU"));
+        QString log;
+        kc.solve_symmetric(fc, u, log); // solve dense on CPU
+MsgLog::information(log);
+    }
+
+    //std::cerr<<"timing: "<<timer.elapsed()/1000.;
 
     //    kc.inverse();
     //    u = kc * f;
 
-    u.clear(1e-11);
+    //u.clear(1e-11);
 
-    flog<<"\n\n Solução\n";
-    flog<<u;
+    //flog<<"\n\n Solução\n";
+    //flog<<u;
 
     //    flog<<"\n\n Error\n";
     //    Mth::Vector error = fcc-kcc*u;
@@ -357,11 +403,11 @@ void Solid3D::solve(void)
 
     //    std::cerr<<"\n\n Matriz de rigidez\n";
     //    std::cerr<<k;
-    reactions.resize(3*nNodes);
+    //reactions.resize(3*nNodes);
 
-    reactions = k*u;
+    //reactions = k*u;
 
-    reactions.clear(1.e-10);
+    //reactions.clear(1.e-10);
 
     //    flog<<"\n\n Reações\n";
     //    flog<<reactions;
@@ -397,7 +443,8 @@ void Solid3D::solve(void)
     //    flog<<"\n\n Tensoes normais (elementos)\n";
     //    flog<<S;
 
-    Snodes.resize(nNodes, 10); //n1, n2, n3, n12, n23, n31, von mises, ux, uy, uz
+#define NRV 14
+    Snodes.resize(nNodes, NRV); //n1, n2, n3, n12, n23, n31, von mises, ux, uy, uz, u
     Mth::Vector contribution(nNodes);
 
     Snodes = 0.0;
@@ -424,7 +471,57 @@ void Solid3D::solve(void)
         Snodes(i,7) = u(3*i); // ux
         Snodes(i,8) = u(3*i+1); // uy
         Snodes(i,9) = u(3*i+2); // uz
+        Snodes(i,10) = sqrt(u(3*i)*u(3*i)+u(3*i+1)*u(3*i+1)+u(3*i+2)*u(3*i+2));
     }
+
+
+    // calculate principal stress
+
+    double w[3];
+    double **m = new double*[3];
+    double **v = new double*[3];
+    for(int i=0; i<3;i++)
+    {
+        m[i] = new double[3];
+        v[i] = new double[3];
+    }
+
+
+    for(int i=0; i<nNodes; i++)
+    {
+        m[0][0] = Snodes(i,0); //n1
+        m[1][0] = Snodes(i,3); //n12
+        m[2][0] = Snodes(i,5); //n31
+        m[0][1] = Snodes(i,3); //n12
+        m[1][1] = Snodes(i,1); //n2
+        m[2][1] = Snodes(i,4); //n23
+        m[0][2] = Snodes(i,5); //n31
+        m[1][2] = Snodes(i,4); //n23
+        m[2][2] = Snodes(i,2); //n3
+
+        vtkMath::Jacobi(m, w, v);
+
+        Snodes(i,11) = w[0]; // sigma1
+        Snodes(i,12) = w[1]; // sigma2
+        Snodes(i,13) = w[2]; // sigma3
+    }
+
+
+
+//    Selements.resize(nElements, 10); //n1, n2, n3, n12, n23, n31, von mises, ux, uy, uz
+
+//    //#pragma omp parallel for num_threads(FEM_NUM_THREADS)
+//    for(int i=0; i<nElements; i++)
+//        for(int t=0; t<7; t++)
+//            Selements(i,t) = S(i,t);
+
+    //    for(int i=0; i<nElements; i++)
+    //    {
+    //        Selements(i,7) = u(3*i); // ux
+    //        Snodes(i,8) = u(3*i+1); // uy
+    //        Snodes(i,9) = u(3*i+2); // uz
+    //    }
+
 
 
     //    //    stress.clear();
@@ -433,11 +530,11 @@ void Solid3D::solve(void)
 
 
 
-    Smax.resize(10);
-    Smin.resize(10);
+    Smax.resize(NRV);
+    Smin.resize(NRV);
 
     //#pragma omp parallel for num_threads(FEM_NUM_THREADS)
-    for(int t=0; t<10; t++)
+    for(int t=0; t<NRV; t++)
     {
         Smax(t) = Snodes(0,t);
         Smin(t) = Snodes(0,t);
@@ -446,16 +543,17 @@ void Solid3D::solve(void)
             if(Snodes(i,t)>Smax(t)) Smax(t) = Snodes(i,t);
             if(Snodes(i,t)<Smin(t)) Smin(t) = Snodes(i,t);
         }
+        MsgLog::result(QString("%1 - min: %2, max: %3").arg(strResults[t]).arg(Smin(t)).arg(Smax(t)));
     }
 
-    flog<<"\n\n Tensoes maximas\n";
-    flog<<Smax;
+    //flog<<"\n\n Tensoes maximas\n";
+    //flog<<Smax;
 
-    flog<<"\n\n Tensoes minimas\n";
-    flog<<Smin;
+    //flog<<"\n\n Tensoes minimas\n";
+    //flog<<Smin;
 
 
-    flog.close();
+    //flog.close();
 
     isSolved = true;
 }
@@ -723,6 +821,9 @@ void Solid3D::report(QString filename, bool isNodesInfo)
         flog<<","<<"Shear stress yz";
         flog<<","<<"Shear stress zx";
         flog<<","<<"Von Mises ";
+        flog<<","<<"Principal stress 1";
+        flog<<","<<"Principal stress 2";
+        flog<<","<<"Principal stress 3";
         flog<<std::endl;
 
 
@@ -734,10 +835,14 @@ void Solid3D::report(QString filename, bool isNodesInfo)
             flog<<","<<u(3*i)<<","<<u(3*i+1)<<","<<u(3*i+2);
             for(int j=0;j<7;j++)
                 flog<<","<<Snodes(i, j);
+            for(int j=10;j<13;j++)
+                flog<<","<<Snodes(i, j);
             flog<<std::endl;
         }
 
         flog.close();
+        MsgLog::information(QString("Nodes report saved: %1").arg(filename));
+
     }
 
     else
@@ -771,8 +876,20 @@ void Solid3D::report(QString filename, bool isNodesInfo)
 
 
         flog.close();
+        MsgLog::information(QString("Elements report saved: %1").arg(filename));
     }
 }
 
+
+void Solid3D::infoGeometry(double &volume, double &weight)
+{
+    volume = 0.0;
+    weight = 0.0;
+    for(int i=0; i<nElements; i++)
+    {
+        volume += elements[i]->V;
+        weight += elements[i]->V*elements[i]->material->density;
+    }
+}
 
 

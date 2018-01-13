@@ -49,5 +49,13 @@
         <file>icons/isometric.png</file>
         <file>icons/lighton.ico</file>
         <file>icons/lightoff.ico</file>
+        <file>icons/cutter.png</file>
+        <file>icons/isosurfaces.png</file>
+        <file>icons/ellipsoids.png</file>
+        <file>icons/hyperstreamlines.png</file>
+        <file>icons/vectors.png</file>
+        <file>icons/superquadric.png</file>
+        <file>icons/scalars.png</file>
+        <file>icons/original.png</file>
     </qresource>
 </RCC>

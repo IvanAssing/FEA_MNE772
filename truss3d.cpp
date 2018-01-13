@@ -2,7 +2,7 @@
 ** Copyright (C) 2017 Ivan Assing da Silva
 ** Contact: ivanassing@gmail.com
 **
-** This file is part of the FEA_MNE715 project.
+** This file is part of the FEA_MNE772 project.
 **
 ** This file is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,12 +23,15 @@
 #include <cmath>
 
 #include <QString>
+#include <QElapsedTimer>
 
+#include "msglog.h"
 #include <mth/matrix.h>
 
 Truss3D::Truss3D(char *filename)
 {
     this->isSolved = false;
+    isIterativeSolver = true;
 
     std::ifstream file(filename, std::ios::in);
     if(file.fail()) std::cerr<<"Error in file loading: "<<filename;
@@ -169,6 +172,7 @@ Truss3D::Truss3D(DXFReader *file)
     }
 
     isMounted = true;
+    isIterativeSolver = true;
 
 }
 
@@ -180,6 +184,7 @@ Truss3D::Truss3D()
     isSolved = false;
     isMounted = false;
     isSolved_simulation = false;
+isIterativeSolver = true;
 }
 
 
@@ -233,7 +238,7 @@ void Truss3D::evalStiffnessMatrix(void)
 
 void Truss3D::solve(void)
 {
-    std::ofstream flog("log_solver.txt");
+    //std::ofstream flog("log_solver.txt");
 
     Mth::Matrix kc(k); // cópias
     Mth::Vector fc(f);
@@ -243,39 +248,39 @@ void Truss3D::solve(void)
         for(int j=0; j<3; j++)
             if(nodes[i]->restrictions[j]==true)
             {
-                flog<<"\n"<<i<<" "<<nodes[i]->restrictions[j];
+                //flog<<"\n"<<i<<" "<<nodes[i]->restrictions[j];
                 int n = 3*nodes[i]->index+j;
                 for(int t=0; t<3*nNodes; t++)
-                    kc(n, t) = 0.0;
+                    kc(n, t) = kc(t, n) = 0.0;
                 kc(n, n) = 1.0;
                 fc(n) = nodes[i]->displacements[j];
             }
 
-    for(int i=0; i<3*nNodes; i++)
-    {
-        bool check = true;
-        for(int j=0; j<3*nNodes; j++)
-            if(fabs(kc(i, j))>1.e-10) {check = false ; break;}
-        if(check)
-        {
-            int t = i/3;
-            int v = i-3*t;
-            flog<<"\n error in line: "<<i<<" node: "<<t<<" v: "<<v;
-            //            for(int t=0; t<3*nNodes; t++)
-            //                kc(i, t) = kc(t, i) = 0.0;
-            //            kc(i, i) = 1.0;
-            //            fc(i) = 0.0;
+//    for(int i=0; i<3*nNodes; i++)
+//    {
+//        bool check = true;
+//        for(int j=0; j<3*nNodes; j++)
+//            if(fabs(kc(i, j))>1.e-10) {check = false ; break;}
+//        if(check)
+//        {
+//            int t = i/3;
+//            int v = i-3*t;
+//            flog<<"\n error in line: "<<i<<" node: "<<t<<" v: "<<v;
+//            //            for(int t=0; t<3*nNodes; t++)
+//            //                kc(i, t) = kc(t, i) = 0.0;
+//            //            kc(i, i) = 1.0;
+//            //            fc(i) = 0.0;
 
-        }
-    }
+//        }
+//    }
 
-    for(int i=0; i<3*nNodes; i++)
-    {
-        bool check = true;
-        for(int j=0; j<3*nNodes; j++)
-            if(fabs(kc(j, i))>1.e-10) {check = false ; break;}
-        if(check) flog<<"\n error in column: "<<i;
-    }
+//    for(int i=0; i<3*nNodes; i++)
+//    {
+//        bool check = true;
+//        for(int j=0; j<3*nNodes; j++)
+//            if(fabs(kc(j, i))>1.e-10) {check = false ; break;}
+//        if(check) flog<<"\n error in column: "<<i;
+//    }
 
 
 
@@ -296,25 +301,41 @@ void Truss3D::solve(void)
     // Aloca vetor para resultados
     u.resize(3*nNodes);
 
-    kc.solve(fc, u);
+    if(isIterativeSolver)
+    {
+        MsgLog::information(QString("Iterative solver, spare matrix on GPU"));
+        QString log;
+        kc.solve_sparse(fc, u, log); // solve sparse on GPU
+        QStringList list;
+        list = log.split("\n");
+        for(int i=0; i<list.size();i++)
+        MsgLog::information(list[i]);
+    }
+    else
+    {
+        MsgLog::information(QString("Direct solver, dense matrix on CPU"));
+        QString log;
+        kc.solve_symmetric(fc, u, log); // solve dense on CPU
+        MsgLog::information(log);
+    }
 
 
-    u.clear();
+    //u.clear();
 
-    flog<<"\n\n Solução\n";
-    flog<<u;
+    //flog<<"\n\n Solução\n";
+    //flog<<u;
 
 
     //    std::cerr<<"\n\n Matriz de rigidez\n";
     //    std::cerr<<k;
-    reactions.resize(3*nNodes);
+    //reactions.resize(3*nNodes);
 
-    reactions = k*u;
+    //reactions = k*u;
 
-    reactions.clear(1.e-10);
+    //reactions.clear(1.e-10);
 
-    flog<<"\n\n Reações\n";
-    flog<<reactions;
+    //flog<<"\n\n Reações\n";
+    //flog<<reactions;
 
 
     Mth::Matrix ue(6);
@@ -334,10 +355,15 @@ void Truss3D::solve(void)
     }
 
     //    stress.clear();
-    flog<<"\n\n Tensoes normais\n";
-    flog<<stress;
+    //flog<<"\n\n Tensoes normais\n";
+    //flog<<stress;
 
-    flog.close();
+    //flog.close();
+
+    double smax, smin;
+    stresslimits(smin, smax);
+    MsgLog::result(QString("normal stress - min: %1, max: %2").arg(smin).arg(smax));
+
 
     isSolved = true;
 }
@@ -404,7 +430,7 @@ void Truss3D::solve_simulation(int steps)
     {
         fcc(i) = f_simulation(i,nSteps-1);
     }
-    kc.solve_sparse(fcc, ucc);
+    kc.solve_symmetric(fcc, ucc);
 
     for(int k=0; k<nSteps; k++)
     {
@@ -539,6 +565,7 @@ void Truss3D::report(QString filename, bool isNodesInfo)
     }
 
     flog.close();
+    MsgLog::information(QString("Nodes report saved: %1").arg(filename));
     }
 
     else
@@ -566,7 +593,28 @@ void Truss3D::report(QString filename, bool isNodesInfo)
 
 
         flog.close();
+        MsgLog::information(QString("Elements report saved: %1").arg(filename));
     }
+}
+
+void Truss3D::infoGeometry(double &volume, double &weight)
+{
+    volume = 0.0;
+    weight = 0.0;
+//    for(int i=0; i<nElements; i++)
+//    {
+//    double c[3];
+
+
+//    for(int i =0; i<3; i++)
+//        c[i] = (node2->coordinates[i] - node1->coordinates[i]); //ci
+
+//    double inv_l = 1.0/sqrt(c[0]*c[0]+c[1]*c[1]+c[2]*c[2]);
+
+
+//        volume += elements[i]->
+//        weight += elements[i]->V*elements[i]->material->density;
+//    }
 }
 
 

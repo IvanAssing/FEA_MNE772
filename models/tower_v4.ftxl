@@ -22,13 +22,13 @@
             </force>
             <force index="1">
                 <value1d dim="x" value="0"/>
-                <value1d dim="y" value="1e5"/>
-                <value1d dim="z" value="0"/>
+                <value1d dim="y" value="-1e5"/>
+                <value1d dim="z" value="-1e6"/>
             </force>
             <force index="2">
                 <value1d dim="x" value="0"/>
-                <value1d dim="y" value="-1e5"/>
-                <value1d dim="z" value="0"/>
+                <value1d dim="y" value="1e5"/>
+                <value1d dim="z" value="-1e6"/>
             </force>
             <force index="3">
                 <value1d dim="x" value="0"/>

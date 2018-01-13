@@ -16,45 +16,587 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
-     <widget class="QSplitter" name="splitter">
+     <widget class="QSplitter" name="splitter_1">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="QTreeWidget" name="treeWidget">
-       <property name="enabled">
-        <bool>true</bool>
+      <widget class="QSplitter" name="splitter_2">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
        </property>
-       <property name="maximumSize">
-        <size>
-         <width>300</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="autoFillBackground">
-        <bool>true</bool>
-       </property>
-       <property name="alternatingRowColors">
-        <bool>true</bool>
-       </property>
-       <property name="animated">
-        <bool>true</bool>
-       </property>
-       <attribute name="headerVisible">
-        <bool>false</bool>
-       </attribute>
-       <attribute name="headerHighlightSections">
-        <bool>true</bool>
-       </attribute>
-       <attribute name="headerMinimumSectionSize">
-        <number>30</number>
-       </attribute>
-       <column>
-        <property name="text">
-         <string notr="true">1</string>
+       <widget class="QTreeWidget" name="treeWidget">
+        <property name="enabled">
+         <bool>true</bool>
         </property>
-       </column>
+        <property name="maximumSize">
+         <size>
+          <width>300</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="alternatingRowColors">
+         <bool>true</bool>
+        </property>
+        <property name="animated">
+         <bool>true</bool>
+        </property>
+        <attribute name="headerVisible">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="headerHighlightSections">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="headerMinimumSectionSize">
+         <number>30</number>
+        </attribute>
+        <column>
+         <property name="text">
+          <string notr="true">1</string>
+         </property>
+        </column>
+       </widget>
+       <widget class="QTabWidget" name="tabWidget">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>30</width>
+          <height>250</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>250</height>
+         </size>
+        </property>
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="tab_1">
+         <attribute name="title">
+          <string>Model</string>
+         </attribute>
+         <widget class="QWidget" name="layoutWidget">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>10</y>
+            <width>281</width>
+            <height>201</height>
+           </rect>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_3">
+           <item row="0" column="0">
+            <layout class="QHBoxLayout" name="horizontalLayout_4">
+             <item>
+              <widget class="QLabel" name="label_4">
+               <property name="text">
+                <string>Deformation Factor</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSlider" name="def_factor">
+               <property name="minimum">
+                <number>-100</number>
+               </property>
+               <property name="maximum">
+                <number>100</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="tickPosition">
+                <enum>QSlider::NoTicks</enum>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="1" column="0">
+            <layout class="QVBoxLayout" name="verticalLayout_4">
+             <item>
+              <widget class="QCheckBox" name="showElements">
+               <property name="text">
+                <string>Show Elements</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="showNodes">
+               <property name="text">
+                <string>Show Nodes</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="showLoading">
+               <property name="text">
+                <string>Show Loading</string>
+               </property>
+               <property name="checked">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="showRestrictions">
+               <property name="text">
+                <string>Show Restrictions</string>
+               </property>
+               <property name="checked">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="ShowUndeformedModel">
+               <property name="text">
+                <string>Show Undeformed Model</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="showTranslucentModel">
+               <property name="text">
+                <string>Show Translucent Model</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="tab_3">
+         <attribute name="title">
+          <string>Ellipsoid Glyphs</string>
+         </attribute>
+         <widget class="QWidget" name="layoutWidget">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>10</y>
+            <width>281</width>
+            <height>111</height>
+           </rect>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_2">
+           <item row="0" column="0">
+            <layout class="QHBoxLayout" name="horizontalLayout">
+             <item>
+              <widget class="QLabel" name="label">
+               <property name="text">
+                <string>Scale Factor</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSlider" name="elg_scalefactor">
+               <property name="minimum">
+                <number>-100</number>
+               </property>
+               <property name="maximum">
+                <number>100</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="tickPosition">
+                <enum>QSlider::NoTicks</enum>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="1" column="0">
+            <layout class="QVBoxLayout" name="verticalLayout">
+             <item>
+              <widget class="QRadioButton" name="elg_colorbyeigen">
+               <property name="text">
+                <string>Color by Eigenvalues</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+               <attribute name="buttonGroup">
+                <string notr="true">buttonGroup</string>
+               </attribute>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="elg_colorbyscalar">
+               <property name="text">
+                <string>Color by Scalars</string>
+               </property>
+               <attribute name="buttonGroup">
+                <string notr="true">buttonGroup</string>
+               </attribute>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="tab_2">
+         <attribute name="title">
+          <string>Superquadric Glyphs</string>
+         </attribute>
+         <widget class="QWidget" name="layoutWidget">
+          <property name="geometry">
+           <rect>
+            <x>12</x>
+            <y>12</y>
+            <width>284</width>
+            <height>171</height>
+           </rect>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_7">
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_5">
+             <item>
+              <widget class="QLabel" name="label_5">
+               <property name="text">
+                <string>Scale Factor</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSlider" name="sqg_scalefactor">
+               <property name="minimum">
+                <number>-100</number>
+               </property>
+               <property name="maximum">
+                <number>100</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="tickPosition">
+                <enum>QSlider::NoTicks</enum>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_5">
+             <item>
+              <widget class="QRadioButton" name="sqg_colorbyeigen">
+               <property name="text">
+                <string>Color by Eigenvalues</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="sqg_colorbyscalar">
+               <property name="text">
+                <string>Color by Scalars</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_10">
+             <item>
+              <widget class="QLabel" name="label_9">
+               <property name="text">
+                <string>Edge Sharpness( γ )</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="sqg_gamma"/>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="sqg_abs_eigenvalues">
+             <property name="text">
+              <string>Use absolute eigenvalues</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="tab_7">
+         <attribute name="title">
+          <string>Hyperstreamlines</string>
+         </attribute>
+         <widget class="QWidget" name="layoutWidget">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>10</y>
+            <width>281</width>
+            <height>214</height>
+           </rect>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_3">
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_8">
+             <item>
+              <widget class="QLabel" name="label_3">
+               <property name="text">
+                <string>Radius Factor</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSlider" name="hsl_radiusfactor">
+               <property name="minimum">
+                <number>-100</number>
+               </property>
+               <property name="maximum">
+                <number>100</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="tickPosition">
+                <enum>QSlider::NoTicks</enum>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_2">
+             <item>
+              <widget class="QLabel" name="label_8">
+               <property name="text">
+                <string>Eigenvector    </string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="hsl_v1">
+               <property name="text">
+                <string>v1</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="hsl_v2">
+               <property name="text">
+                <string>v2</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="hsl_v3">
+               <property name="text">
+                <string>v3</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="groupBox">
+             <property name="title">
+              <string>Start points from:</string>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_9">
+              <item>
+               <layout class="QVBoxLayout" name="verticalLayout_2">
+                <item>
+                 <widget class="QCheckBox" name="hsl_spLoading">
+                  <property name="text">
+                   <string>Loading</string>
+                  </property>
+                  <property name="checked">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="hsl_spRestrictions">
+                  <property name="text">
+                   <string>Restrictions</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="hsl_spPlanez0">
+                  <property name="text">
+                   <string>Plane z=0</string>
+                  </property>
+                  <property name="checked">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="hsl_spRandom">
+                  <property name="text">
+                   <string>Random points</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="tab">
+         <attribute name="title">
+          <string>Isosurface</string>
+         </attribute>
+         <widget class="QWidget" name="layoutWidget">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>10</y>
+            <width>281</width>
+            <height>31</height>
+           </rect>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <widget class="QLabel" name="label_2">
+             <property name="text">
+              <string>Number of Slices</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="nIsoSurfaceSlices">
+             <property name="value">
+              <number>7</number>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="tab_4">
+         <attribute name="title">
+          <string>Cutting Plane</string>
+         </attribute>
+         <widget class="QWidget" name="layoutWidget">
+          <property name="geometry">
+           <rect>
+            <x>9</x>
+            <y>10</y>
+            <width>281</width>
+            <height>111</height>
+           </rect>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_6">
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_7">
+             <item>
+              <widget class="QLabel" name="label_6">
+               <property name="text">
+                <string>Position</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSlider" name="cutter_position">
+               <property name="minimum">
+                <number>-100</number>
+               </property>
+               <property name="maximum">
+                <number>100</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="tickPosition">
+                <enum>QSlider::NoTicks</enum>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_6">
+             <item>
+              <widget class="QLabel" name="label_7">
+               <property name="text">
+                <string>Normal Plane</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="cutter_nx"/>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="cutter_ny"/>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="cutter_nz">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="inputMask">
+                <string/>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="showLeftPart">
+             <property name="text">
+              <string>Show left part</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+       </widget>
+       <widget class="QListWidget" name="listWidget">
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+       </widget>
       </widget>
-      <widget class="GraphicWindow" name="openGLWidget">
+      <widget class="vtkGraphicWindow" name="openGLWidget">
        <property name="mouseTracking">
         <bool>true</bool>
        </property>
@@ -93,6 +635,8 @@
      <string>&amp;Solver</string>
     </property>
     <addaction name="action_Solver"/>
+    <addaction name="action_Solver_2"/>
+    <addaction name="action_Solver_3"/>
    </widget>
    <widget class="QMenu" name="menu_View">
     <property name="title">
@@ -113,10 +657,24 @@
     <addaction name="actionNodesReport"/>
     <addaction name="actionElementsReport"/>
    </widget>
+   <widget class="QMenu" name="menuViSC">
+    <property name="title">
+     <string>ViSC</string>
+    </property>
+    <addaction name="actionOriginalMesh"/>
+    <addaction name="actionScalarColorMap"/>
+    <addaction name="actionCutterScalar"/>
+    <addaction name="actionIsosurface"/>
+    <addaction name="actionVectorDisplacement"/>
+    <addaction name="actionEllipsoid"/>
+    <addaction name="actionSuperquadricGlyph"/>
+    <addaction name="actionHyperstreamline"/>
+   </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Solver"/>
    <addaction name="menu_View"/>
    <addaction name="menu_Reports"/>
+   <addaction name="menuViSC"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -129,12 +687,9 @@
    <addaction name="action_Save"/>
    <addaction name="actionSave_As"/>
    <addaction name="separator"/>
-   <addaction name="actiontakeSnapshoot"/>
+   <addaction name="actionScreenshoot"/>
    <addaction name="separator"/>
    <addaction name="action_Solver"/>
-   <addaction name="actionSelect"/>
-   <addaction name="actionLegend"/>
-   <addaction name="actionTurnOffLighting"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QToolBar" name="viewsToolBar">
@@ -182,10 +737,14 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionGrid"/>
-   <addaction name="actionInitialMesh"/>
-   <addaction name="actionSolved_Mesh"/>
-   <addaction name="actionShowMesh"/>
+   <addaction name="actionOriginalMesh"/>
+   <addaction name="actionScalarColorMap"/>
+   <addaction name="actionCutterScalar"/>
+   <addaction name="actionIsosurface"/>
+   <addaction name="actionVectorDisplacement"/>
+   <addaction name="actionEllipsoid"/>
+   <addaction name="actionSuperquadricGlyph"/>
+   <addaction name="actionHyperstreamline"/>
   </widget>
   <widget class="QToolBar" name="resultsToolBar">
    <property name="windowTitle">
@@ -203,11 +762,17 @@
    <addaction name="actionstressxy"/>
    <addaction name="actionstressyz"/>
    <addaction name="actionstresszx"/>
+   <addaction name="separator"/>
    <addaction name="actionstressvonmises"/>
+   <addaction name="separator"/>
+   <addaction name="actionpstress1"/>
+   <addaction name="actionpstress2"/>
+   <addaction name="actionpstress3"/>
    <addaction name="separator"/>
    <addaction name="actionresultux"/>
    <addaction name="actionresultuy"/>
    <addaction name="actionresultuz"/>
+   <addaction name="actionresultabsu"/>
   </widget>
   <action name="actionTopView">
    <property name="icon">
@@ -352,16 +917,16 @@
     <string>stop simulation</string>
    </property>
   </action>
-  <action name="actiontakeSnapshoot">
+  <action name="actionScreenshoot">
    <property name="icon">
     <iconset resource="icons.qrc">
      <normaloff>:/icons/saveimage.ico</normaloff>:/icons/saveimage.ico</iconset>
    </property>
    <property name="text">
-    <string>takeSnapshoot</string>
+    <string>screenshoot</string>
    </property>
    <property name="toolTip">
-    <string>take a picture from drawing screen</string>
+    <string>screenshoot</string>
    </property>
   </action>
   <action name="actionBottomView">
@@ -436,49 +1001,49 @@
     <string>select a element</string>
    </property>
   </action>
-  <action name="actionGrid">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
+  <action name="actionScalarColorMap">
    <property name="icon">
     <iconset resource="icons.qrc">
-     <normaloff>:/icons/axis_grid.ico</normaloff>:/icons/axis_grid.ico</iconset>
+     <normaloff>:/icons/scalars.png</normaloff>:/icons/scalars.png</iconset>
    </property>
    <property name="text">
-    <string>Grid</string>
+    <string>Scalar Color Mapping</string>
    </property>
    <property name="toolTip">
-    <string>draw grid</string>
+    <string>scalar color mapping</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+1</string>
    </property>
   </action>
-  <action name="actionInitialMesh">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
+  <action name="actionCutterScalar">
    <property name="icon">
     <iconset resource="icons.qrc">
-     <normaloff>:/icons/mesh_dots.png</normaloff>:/icons/mesh_dots.png</iconset>
+     <normaloff>:/icons/cutter.png</normaloff>:/icons/cutter.png</iconset>
    </property>
    <property name="text">
-    <string>Initial Mesh</string>
+    <string>Cutting Plane</string>
    </property>
    <property name="toolTip">
-    <string>initial mesh</string>
+    <string>scalar cutting plane</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+2</string>
    </property>
   </action>
-  <action name="actionSolved_Mesh">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
+  <action name="actionOriginalMesh">
    <property name="icon">
     <iconset resource="icons.qrc">
-     <normaloff>:/icons/mesh_def.png</normaloff>:/icons/mesh_def.png</iconset>
+     <normaloff>:/icons/original.png</normaloff>:/icons/original.png</iconset>
    </property>
    <property name="text">
-    <string>Solved Mesh</string>
+    <string>Original Model</string>
    </property>
    <property name="toolTip">
-    <string>solved mesh</string>
+    <string>original model</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+0</string>
    </property>
   </action>
   <action name="actionstressyy">
@@ -566,7 +1131,7 @@
     <string>ux</string>
    </property>
    <property name="toolTip">
-    <string>result displacement x</string>
+    <string>displacement x</string>
    </property>
   </action>
   <action name="actionresultuy">
@@ -577,7 +1142,7 @@
     <string>uy</string>
    </property>
    <property name="toolTip">
-    <string>result displacement y</string>
+    <string>displacement y</string>
    </property>
   </action>
   <action name="actionresultuz">
@@ -588,13 +1153,10 @@
     <string>uz</string>
    </property>
    <property name="toolTip">
-    <string>result displacement z</string>
+    <string>displacement z</string>
    </property>
   </action>
   <action name="actionLegend">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="icon">
     <iconset resource="icons.qrc">
      <normaloff>:/icons/legend.png</normaloff>:/icons/legend.png</iconset>
@@ -635,9 +1197,6 @@
    </property>
   </action>
   <action name="actionTurnOffLighting">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="icon">
     <iconset resource="icons.qrc">
      <normaloff>:/icons/lightoff.ico</normaloff>
@@ -651,9 +1210,6 @@
    </property>
   </action>
   <action name="actionShowMesh">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="icon">
     <iconset resource="icons.qrc">
      <normaloff>:/icons/surface.ico</normaloff>:/icons/surface.ico</iconset>
@@ -666,9 +1222,6 @@
    </property>
   </action>
   <action name="actionShowNumbering">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="icon">
     <iconset resource="icons.qrc">
      <normaloff>:/icons/surface.ico</normaloff>:/icons/surface.ico</iconset>
@@ -680,17 +1233,163 @@
     <string>show numbering</string>
    </property>
   </action>
+  <action name="actionEllipsoid">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/ellipsoids.png</normaloff>:/icons/ellipsoids.png</iconset>
+   </property>
+   <property name="text">
+    <string>Ellipsoid Glyphs</string>
+   </property>
+   <property name="toolTip">
+    <string>tensor ellipsoid glyph</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+5</string>
+   </property>
+  </action>
+  <action name="actionHyperstreamline">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/hyperstreamlines.png</normaloff>:/icons/hyperstreamlines.png</iconset>
+   </property>
+   <property name="text">
+    <string>Hyperstreamlines</string>
+   </property>
+   <property name="toolTip">
+    <string>tensor hyperstreamlines</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+7</string>
+   </property>
+  </action>
+  <action name="actionIsosurface">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/isosurfaces.png</normaloff>:/icons/isosurfaces.png</iconset>
+   </property>
+   <property name="text">
+    <string>Isosurface</string>
+   </property>
+   <property name="toolTip">
+    <string>scalar isosurface</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+4</string>
+   </property>
+  </action>
+  <action name="actionSuperquadricGlyph">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/superquadric.png</normaloff>:/icons/superquadric.png</iconset>
+   </property>
+   <property name="text">
+    <string>Superquadric Glyphs</string>
+   </property>
+   <property name="toolTip">
+    <string>tensor superquadric glyph</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+6</string>
+   </property>
+  </action>
+  <action name="actionVectorDisplacement">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/vectors.png</normaloff>:/icons/vectors.png</iconset>
+   </property>
+   <property name="text">
+    <string>Vector Displacement</string>
+   </property>
+   <property name="toolTip">
+    <string>vector displacement</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+3</string>
+   </property>
+  </action>
+  <action name="actionpstress1">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>σ1</string>
+   </property>
+   <property name="toolTip">
+    <string>principal stress 1</string>
+   </property>
+  </action>
+  <action name="actionpstress2">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>σ2</string>
+   </property>
+   <property name="toolTip">
+    <string>principal stress 2</string>
+   </property>
+  </action>
+  <action name="actionpstress3">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>σ3</string>
+   </property>
+   <property name="toolTip">
+    <string>principal stress 3</string>
+   </property>
+  </action>
+  <action name="action_Solver_2">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/solver.png</normaloff>:/icons/solver.png</iconset>
+   </property>
+   <property name="text">
+    <string>Solver &amp;Iterative (GPU)</string>
+   </property>
+   <property name="toolTip">
+    <string>solver the FEA model</string>
+   </property>
+  </action>
+  <action name="action_Solver_3">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/solver.png</normaloff>:/icons/solver.png</iconset>
+   </property>
+   <property name="text">
+    <string>Solver &amp;Direct (CPU)</string>
+   </property>
+   <property name="toolTip">
+    <string>solver the FEA model</string>
+   </property>
+  </action>
+  <action name="actionresultabsu">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>|u|</string>
+   </property>
+   <property name="toolTip">
+    <string>absolute displacement</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>GraphicWindow</class>
+   <class>vtkGraphicWindow</class>
    <extends>QOpenGLWidget</extends>
-   <header location="global">graphicwindow.h</header>
+   <header>vtkgraphicwindow.h</header>
   </customwidget>
  </customwidgets>
  <resources>
   <include location="icons.qrc"/>
  </resources>
  <connections/>
+ <buttongroups>
+  <buttongroup name="buttonGroup"/>
+ </buttongroups>
 </ui>

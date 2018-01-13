@@ -21,9 +21,9 @@
                 <value1d dim="z" value="0"/>
             </force>
             <pressure index="0">
-                <value1d dim="x" value="            1000"/>
-                <value1d dim="y" value="            1000"/>
-                <value1d dim="z" value="            1000"/>
+                <value1d dim="x" value="10000"/>
+                <value1d dim="y" value="10000"/>
+                <value1d dim="z" value="-10000"/>
             </pressure>
         </loading>
         <displacements count="2">
@@ -9219,7 +9219,7 @@
         <materials count="1">
             <material index="0">
                 <value1d dim="name" value="material 0"/>
-                <value1d dim="density" value="7.8548680E-09"/>
+                <value1d dim="density" value="7.8548680E03"/>
                 <value1d dim="E" value="1.9994796E+11"/>
                 <value1d dim="poison" value="2.9000000E-01"/>
             </material>

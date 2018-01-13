@@ -2,7 +2,7 @@
 ** Copyright (C) 2017 Ivan Assing da Silva
 ** Contact: ivanassing@gmail.com
 **
-** This file is part of the FEA_MNE715 project.
+** This file is part of the FEA_MNE772 project.
 **
 ** This file is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 
 #include "node3d.h"
 #include "solid3delement.h"
+#include "msglog.h"
 
 #include <mth/matrix.h>
 #include <mth/vector.h>
@@ -58,6 +59,7 @@ public:
 
     Mth::Vector reactions;
     Mth::Matrix Snodes;
+    Mth::Matrix Selements;
     Mth::Matrix *Snodes_simulation;
 
 
@@ -75,6 +77,8 @@ public:
 
     void evalStressLimits(void);
 
+    void infoGeometry(double &volume, double &weight);
+
     void solve(void);
 
     // variables for ramp computation
@@ -88,6 +92,7 @@ public:
     void solve_simulation(int nSteps);
     //void stresslimits_simulation(double &min, double &max);
     bool isSolved_simulation;
+    bool isIterativeSolver;
 
 
 //protected:

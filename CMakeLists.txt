@@ -13,6 +13,41 @@ SET(Qt5Gui_DIR "/opt/qt-5.9.1/5.9.1/gcc_64/lib/cmake/Qt5Gui")
 SET(Qt5Widgets_DIR "/opt/qt-5.9.1/5.9.1/gcc_64/lib/cmake/Qt5Widgets")
 SET(Qt5OpenGL_DIR "/opt/qt-5.9.1/5.9.1/gcc_64/lib/cmake/Qt5OpenGL")
 
+SET(ExpertLIB_DIR "/opt") # expert libraries
+SET(BuiltLIB_DIR "../library") # built libraries
+
+#include directories
+include_directories(${BuiltLIB_DIR})
+include_directories(${ExpertLIB_DIR}/dxflib/include)
+include_directories(${ExpertLIB_DIR}/cuda-8.0/include)
+include_directories(${ExpertLIB_DIR}/magma-2.2.0/include)
+
+# find libraries
+find_library(MTH
+    NAMES mth
+    PATHS ${BuiltLIB_DIR}/mth/lib NO_DEFAULT_PATH
+    )
+
+find_library(DXFLIB
+    NAMES dxflib
+    PATHS ${ExpertLIB_DIR}/dxflib/lib NO_DEFAULT_PATH
+    )
+
+find_library(CUDA
+    NAMES cublas cusparse cudart cudadevrt
+    PATHS ${ExpertLIB_DIR}/cuda-8.0/lib64 NO_DEFAULT_PATH
+    )
+
+find_library(MAGMA
+    NAMES magma magma_sparse
+    PATHS ${ExpertLIB_DIR}/magma-2.2.0/lib NO_DEFAULT_PATH
+    )
+
+#find_library(SuperquadricTensorGlyphFilter
+#    NAMES SuperquadricTensorGlyphFilter
+#    PATHS ${BuiltLIB_DIR}/SuperquadricTensorGlyphFilter/lib NO_DEFAULT_PATH
+#    )
+
 # List source files & resources
 file (GLOB_RECURSE Sources *.cpp)
 file (GLOB_RECURSE Headers *.h)
@@ -41,4 +76,4 @@ include_directories(${VTK_INCLUDE_DIRS})
 add_executable(FEA_MNE772 ${Sources} ${Headers} ${Resources} ${UIs})
 
 # Link libraries
-target_link_libraries(FEA_MNE772 Qt5::Widgets Qt5::OpenGL ${VTK_LIBRARIES})
+target_link_libraries(FEA_MNE772 Qt5::Widgets Qt5::OpenGL GLU GL freetype ${VTK_LIBRARIES} ${MTH} ${MAGMA} ${CUDA} ${DXFLIB})
